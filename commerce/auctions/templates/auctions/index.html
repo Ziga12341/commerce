@@ -2,6 +2,10 @@
 
 {% block body %}
     <h2>Active Listings</h2>
-
-    TODO
+        <ul>
+        {% for listing in listings %}
+            <li>{{ listing.title }} {{ listing.description }} {{ listing.current_price }} {{ listing.image_url }}</li>
+        {% endfor %}
+        </ul>
+    <a href="{% url 'new' %}">Create new listing</a>
 {% endblock %}

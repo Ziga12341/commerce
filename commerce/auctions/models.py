@@ -10,6 +10,10 @@ class User(AbstractUser):
     pass
 
 
+class AuctionCategories(models.Model):
+    category_name = models.CharField(max_length=64)
+
+
 class Auction(models.Model):
     """
     A model for an auction listing. Each auction listing has a title, description, current bid, image URL, and category.
@@ -19,8 +23,9 @@ class Auction(models.Model):
     description = models.TextField()
     current_price = models.DecimalField(max_digits=10, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
-    categories = models.ManyToManyField("AuctionCategories", blank=True, related_name="auctions")
+    categories = models.ManyToManyField(AuctionCategories, blank=True, related_name="auctions")
     closed_at = models.DateTimeField(blank=True, null=True)
+    image_url = models.URLField(blank=True, null=True)
 
 
 class Bid(models.Model):
@@ -35,7 +40,3 @@ class Comment(models.Model):
     auction = models.ForeignKey(Auction, on_delete=models.CASCADE, related_name="comments")
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comments")
     content = models.TextField()
-
-
-class AuctionCategories(models.Model):
-    category_name = models.CharField(max_length=64)
