@@ -3,9 +3,10 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-
 # user should have information about auctions they have created
-#
+# user can add an auction to their “Watchlist.”
+
+
 class User(AbstractUser):
     pass
 
@@ -40,3 +41,10 @@ class Comment(models.Model):
     auction = models.ForeignKey(Auction, on_delete=models.CASCADE, related_name="comments")
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comments")
     content = models.TextField()
+
+
+class Watchlist(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="watchlist")
+    auction = models.ForeignKey(Auction, on_delete=models.CASCADE, related_name="watchlist")
+    added_to_watchlist = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)

@@ -4,15 +4,8 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
-from .models import User, Auction, Bid, Comment, AuctionCategories
+from .models import User, Auction, Bid, Comment, AuctionCategories, Watchlist
 from django import forms
-
-FRUIT_CHOICES= [
-    ('orange', 'Oranges'),
-    ('cantaloupe', 'Cantaloupes'),
-    ('mango', 'Mangoes'),
-    ('honeydew', 'Honeydews'),
-    ]
 
 
 class NewListingForm(forms.Form):
@@ -25,6 +18,18 @@ class NewListingForm(forms.Form):
                             [category for category in AuctionCategories.objects.all().values_list(
                                     'category_name', 'category_name')]))
     image_url = forms.URLField(label="Image URL")
+
+
+class AddListingToWatchlistForm(forms.Form):
+    add_to_watchlist = forms.BooleanField(label="Add to watchlist", required=False, initial=True)
+
+
+class RemoveListingFromWatchlistForm(forms.Form):
+    remove_from_watchlist = forms.BooleanField(label="Remove from watchlist", required=False, initial=True)
+
+
+class AddBidForm(forms.Form):
+    bid = forms.DecimalField(label="Bid")
 
 
 def index(request):
@@ -118,13 +123,72 @@ def create_new_listing(request):
                   "form": NewListingForm(),
                   })
 
+
 def show_categories(request):
     return render(request, "auctions/categories.html", {
         "categories": AuctionCategories.objects.all()
     })
 
 
-def show_listings(request):
-    return render(request, "auctions/index.html", {
-        "listings": Auction.objects.all(),
+def show_listing(request, listing_id):
+    # This listing / auction
+    auction = Auction.objects.get(pk=listing_id)
+
+    in_watchlist = False
+    # check if user is not None
+    if request.user.is_authenticated:
+        in_watchlist = len(request.user.watchlist.filter(auction=listing_id)) > 0
+
+    if request.method == "POST":
+        # Check if "action1" is in payload of POST request (i.e. title is field name)
+        # - like this for new item form: print("title" in request.POST)
+        # click button add to watchlist - usen need to be logged in
+
+        if "add_to_watchlist" in request.POST:
+            # add_to_watchlist is in payload of POST request (i.e. title is field name)
+            form = AddListingToWatchlistForm(request.POST)
+            if form.is_valid():
+
+                if not in_watchlist:
+                    watchlist = Watchlist.objects.create(user=request.user, auction=auction)
+                    watchlist.save()
+                    print("saved")
+                    in_watchlist = True
+
+                return HttpResponseRedirect(reverse("listing", args=(listing_id,)))
+            else:
+                return HttpResponse("Invalid form")
+
+        elif "remove_from_watchlist" in request.POST:
+            form = RemoveListingFromWatchlistForm(request.POST)
+            if form.is_valid():
+
+                if in_watchlist:
+                    watchlist = Watchlist.objects.filter(user=request.user, auction=auction)
+                    watchlist.delete()
+                    in_watchlist = False
+
+                return HttpResponseRedirect(reverse("listing", args=(listing_id,)))
+            else:
+                return HttpResponse("Invalid form")
+    #     elif "action2" in request.POST:
+    #
+    #         ...
+    #         # Handle action 2
+    #     else:
+    #         ...
+    #         # Handle other POST requests
+    # else:
+    #     ...
+    #     # Handle GET request
+
+    # Does the current user have this auction in their watchlist?
+
+    return render(request, "auctions/listing.html", {
+        "listing": Auction.objects.all().get(id=listing_id),
+        "addForm": AddListingToWatchlistForm(),
+        "removeForm": RemoveListingFromWatchlistForm(),
+        "in_watchlist": in_watchlist,
+
+
     })

@@ -1,0 +1,44 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    {% if user.is_authenticated %}
+        <p>Welcome, {{ user.username }}!</p>
+    {% else %}
+        <p>Please <a href="{% url 'login' %}">log in</a> to continue.</p>
+    {% endif %}
+    <h2>Listing {{ listing.id }}</h2>
+        <ul>
+            <div>
+                <div><img src="{{ listing.image_url }}"></div>
+                <div>{{ listing.title }}</div>
+                <div>{{ listing.description }}</div>
+                <div>{{ listing.current_price }}</div>
+            </div>
+        </ul>
+    {% if user.is_authenticated %}
+        <h1>{{ watchlist }}</h1>
+        <p>Add to Watchlist button? maybe do with forms and post requeast</p>
+        <p>Place bid button? maybe do with forms and post requeast</p>
+        <!--if this user already added item to watchlist display Item in watchlist else Item not in watchlist-->
+        {% if in_watchlist %}
+            <!--remove from watchlist button-->
+            <form action="{% url 'listing' listing.id %}" method="POST">
+                {% csrf_token %}
+                {{ removeForm.remove_from_watchlist.as_hidden }}
+                <button type="submit">Remove from Watchlist</button>
+            </form>
+            <p>Item in watchlist</p>
+        {% else %}
+            <!--add to watchlist button-->
+            <form action="{% url 'listing' listing.id %}" method="POST">
+                {% csrf_token %}
+                {{ addForm.add_to_watchlist.as_hidden }}
+                <button type="submit">Add to Watchlist</button>
+            </form>
+            <p>Item not in watchlist</p>
+        {% endif %}
+    {% else %}
+        <p>Please <a href="{% url 'login' %}">log in</a> to continue.</p>
+    {% endif %}
+    <a href="{% url 'new' %}">Create new listing</a>
+{% endblock %}
