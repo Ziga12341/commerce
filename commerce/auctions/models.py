@@ -42,6 +42,7 @@ class Comment(models.Model):
     auction = models.ForeignKey(Auction, on_delete=models.CASCADE, related_name="comments")
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comments")
     content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
 class Watchlist(models.Model):

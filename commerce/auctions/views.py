@@ -36,6 +36,10 @@ class CloseAuctionForm(forms.Form):
     close_auction = forms.BooleanField(label="Close auction", required=False, initial=True)
 
 
+class AddCommentForm(forms.Form):
+    comment = forms.CharField(label='Comment', widget=forms.Textarea(attrs={'name':'comment', 'rows':10, 'cols':40}))
+
+
 def index(request):
     return render(request, "auctions/index.html", {
         "listings": Auction.objects.all(),
@@ -193,6 +197,25 @@ def show_listing(request, listing_id):
                         Your bid {bid} € was smaller or equal than the current price which is {auction.current_price} €
                         Please try again with a higher bid
                         """)
+        elif "close_auction" in request.POST:
+            form = CloseAuctionForm(request.POST)
+            if form.is_valid():
+                form_payload = form.cleaned_data["close_auction"]
+                auction.closed = form_payload
+                auction.save()
+                return HttpResponseRedirect(reverse("listing", args=(listing_id,)))
+            else:
+                return HttpResponse("Invalid form")
+
+        elif "comment" in request.POST:
+            form = AddCommentForm(request.POST)
+            if form.is_valid():
+                comment = form.cleaned_data["comment"]
+                comment = Comment.objects.create(user=request.user, auction=auction, content=comment)
+                comment.save()
+                return HttpResponseRedirect(reverse("listing", args=(listing_id,)))
+            else:
+                return HttpResponse("Invalid form")
         #     ...
         #     # Handle action 2
         # else:
@@ -203,7 +226,6 @@ def show_listing(request, listing_id):
     #     # Handle GET request
 
     # Does the current user have this auction in their watchlist?
-
     return render(request, "auctions/listing.html", {
         "listing": Auction.objects.all().get(id=listing_id),
         "addForm": AddListingToWatchlistForm(),
@@ -214,5 +236,10 @@ def show_listing(request, listing_id):
         "who_created_listing": user,
         "currently_logged_in_user": request.user,
         "closeForm": CloseAuctionForm(),
+        "listing_closed": auction.closed,
+        "winner": bids.last().user if len(bids) > 0 else None,
+        "comments": Comment.objects.filter(auction=auction).all(),
+        "number_of_comments": len(Comment.objects.filter(auction=auction)),
+        "commentForm": AddCommentForm()
 
     })
