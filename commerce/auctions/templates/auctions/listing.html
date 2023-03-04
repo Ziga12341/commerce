@@ -12,13 +12,10 @@
                 <div><img src="{{ listing.image_url }}"></div>
                 <div>{{ listing.title }}</div>
                 <div>{{ listing.description }}</div>
-                <div>{{ listing.current_price }}</div>
+                <div>{{ listing.current_price }}€</div>
             </div>
         </ul>
     {% if user.is_authenticated %}
-        <h1>{{ watchlist }}</h1>
-        <p>Add to Watchlist button? maybe do with forms and post requeast</p>
-        <p>Place bid button? maybe do with forms and post requeast</p>
         <!--if this user already added item to watchlist display Item in watchlist else Item not in watchlist-->
         {% if in_watchlist %}
             <!--remove from watchlist button-->
@@ -37,6 +34,18 @@
             </form>
             <p>Item not in watchlist</p>
         {% endif %}
+
+        <!--logged-in user can bid on item-->
+        <!--number of bids so far-->
+
+        <p>Place a bid</p>
+        <p>Current bid: {{ listing.current_price }} €</p>
+        <p>Number of bids so far {{ number_of_bids }}</p>
+        <form action="{% url 'listing' listing.id %}" method="POST">
+            {% csrf_token %}
+            {{ bidForm.bid }}
+            <button type="submit">Bid</button>
+        </form>
     {% else %}
         <p>Please <a href="{% url 'login' %}">log in</a> to continue.</p>
     {% endif %}

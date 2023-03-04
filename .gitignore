@@ -1,6 +1,6 @@
 .gitignore
 /.idea
-
+notes.txt
 # Django #
 *.log
 *.pot

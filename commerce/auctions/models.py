@@ -22,7 +22,7 @@ class Auction(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=64)
     description = models.TextField()
-    current_price = models.DecimalField(max_digits=10, decimal_places=2)
+    current_price = models.DecimalField(max_digits=20, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
     categories = models.ManyToManyField(AuctionCategories, blank=True, related_name="auctions")
     closed_at = models.DateTimeField(blank=True, null=True)

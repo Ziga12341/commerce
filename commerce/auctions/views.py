@@ -133,7 +133,8 @@ def show_categories(request):
 def show_listing(request, listing_id):
     # This listing / auction
     auction = Auction.objects.get(pk=listing_id)
-
+    # Get all bids for this listing
+    bids = Bid.objects.filter(auction=auction)
     in_watchlist = False
     # check if user is not None
     if request.user.is_authenticated:
@@ -152,7 +153,6 @@ def show_listing(request, listing_id):
                 if not in_watchlist:
                     watchlist = Watchlist.objects.create(user=request.user, auction=auction)
                     watchlist.save()
-                    print("saved")
                     in_watchlist = True
 
                 return HttpResponseRedirect(reverse("listing", args=(listing_id,)))
@@ -171,13 +171,27 @@ def show_listing(request, listing_id):
                 return HttpResponseRedirect(reverse("listing", args=(listing_id,)))
             else:
                 return HttpResponse("Invalid form")
-    #     elif "action2" in request.POST:
-    #
-    #         ...
-    #         # Handle action 2
-    #     else:
-    #         ...
-    #         # Handle other POST requests
+        elif "bid" in request.POST:
+            form = AddBidForm(request.POST)
+            if form.is_valid():
+                bid = form.cleaned_data["bid"]
+                if bid > auction.current_price:
+                    bids_price = Bid.objects.create(user=request.user, auction=auction, price=bid)
+                    bids_price.save()
+                    auction.current_price = bid
+                    auction.save()
+                    return HttpResponseRedirect(reverse("listing", args=(listing_id,)))
+                else:
+                    return HttpResponse(
+                        f"""
+                        Your bid {bid} € was smaller or equal than the current price which is {auction.current_price} €
+                        Please try again with a higher bid
+                        """)
+        #     ...
+        #     # Handle action 2
+        # else:
+        #     ...
+            # Handle other POST requests
     # else:
     #     ...
     #     # Handle GET request
@@ -188,7 +202,9 @@ def show_listing(request, listing_id):
         "listing": Auction.objects.all().get(id=listing_id),
         "addForm": AddListingToWatchlistForm(),
         "removeForm": RemoveListingFromWatchlistForm(),
+        "bidForm": AddBidForm(),
         "in_watchlist": in_watchlist,
+        "number_of_bids": len(bids),
 
 
     })
