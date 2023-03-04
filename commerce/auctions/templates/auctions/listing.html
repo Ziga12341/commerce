@@ -16,6 +16,18 @@
             </div>
         </ul>
     {% if user.is_authenticated %}
+        <!--if this user is logged in display Logged-in user created this auction else display this listing is from this user-->
+        {% if currently_logged_in_user == who_created_listing %}
+            <p>Logged in user created this auction. User is: {{ user.username }}</p>
+            <p>You can close this listing</p>
+            <form action="{% url 'listing' listing.id %}" method="POST">
+                {% csrf_token %}
+                {{ closeForm.close_auction.as_hidden }}
+                <button type="submit">Close listing</button>
+        {% else %}
+            <p>This listing is from {{ who_created_listing }}</p>
+        {% endif %}
+
         <!--if this user already added item to watchlist display Item in watchlist else Item not in watchlist-->
         {% if in_watchlist %}
             <!--remove from watchlist button-->

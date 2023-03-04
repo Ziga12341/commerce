@@ -25,6 +25,7 @@ class Auction(models.Model):
     current_price = models.DecimalField(max_digits=20, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
     categories = models.ManyToManyField(AuctionCategories, blank=True, related_name="auctions")
+    closed = models.BooleanField(default=False)
     closed_at = models.DateTimeField(blank=True, null=True)
     image_url = models.URLField(blank=True, null=True)
 

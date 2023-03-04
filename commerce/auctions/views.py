@@ -32,6 +32,10 @@ class AddBidForm(forms.Form):
     bid = forms.DecimalField(label="Bid")
 
 
+class CloseAuctionForm(forms.Form):
+    close_auction = forms.BooleanField(label="Close auction", required=False, initial=True)
+
+
 def index(request):
     return render(request, "auctions/index.html", {
         "listings": Auction.objects.all(),
@@ -135,6 +139,8 @@ def show_listing(request, listing_id):
     auction = Auction.objects.get(pk=listing_id)
     # Get all bids for this listing
     bids = Bid.objects.filter(auction=auction)
+    # Get user who created this listing
+    user = auction.user
     in_watchlist = False
     # check if user is not None
     if request.user.is_authenticated:
@@ -205,6 +211,8 @@ def show_listing(request, listing_id):
         "bidForm": AddBidForm(),
         "in_watchlist": in_watchlist,
         "number_of_bids": len(bids),
-
+        "who_created_listing": user,
+        "currently_logged_in_user": request.user,
+        "closeForm": CloseAuctionForm(),
 
     })
