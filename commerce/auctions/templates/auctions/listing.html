@@ -94,6 +94,8 @@
             {% endfor %}
         </ul>
         </div>
+    <div>Additional info</div>
+        <div>Category: {{ category_name }}</div>
     {% else %}
         <p>Please <a href="{% url 'login' %}">log in</a> to continue.</p>
     {% endif %}

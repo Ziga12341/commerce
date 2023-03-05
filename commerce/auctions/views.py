@@ -17,7 +17,7 @@ class NewListingForm(forms.Form):
         widget=forms.Select(choices=
                             [category for category in AuctionCategories.objects.all().values_list(
                                     'category_name', 'category_name')]))
-    image_url = forms.URLField(label="Image URL")
+    image_url = forms.URLField(label="Image URL", required=False)
 
 
 class AddListingToWatchlistForm(forms.Form):
@@ -236,7 +236,9 @@ def show_listing(request, listing_id):
         "winner": bids.last().user if len(bids) > 0 else None,
         "comments": Comment.objects.filter(auction=auction).all(),
         "number_of_comments": len(Comment.objects.filter(auction=auction)),
-        "commentForm": AddCommentForm()
+        "commentForm": AddCommentForm(),
+        "category_name": auction.categories.get().category_name if auction.categories.all().count() == 1 else None,
+
 
     })
 
