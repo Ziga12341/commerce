@@ -115,11 +115,13 @@ def create_new_listing(request):
             current_price = form.cleaned_data["current_price"]
             image_url = form.cleaned_data["image_url"]
             category = form.cleaned_data["categories"]
+            category_object = AuctionCategories.objects.get(category_name=category)
 
             # Add the new auction to the database
             new_auction = Auction(title=title, description=description, current_price=current_price,
                                   image_url=image_url, user=request.user)
             new_auction.save()
+            new_auction.categories.add(category_object)
 
             # Redirect user to list of auctions
             return HttpResponseRedirect(reverse("index"))
@@ -130,12 +132,6 @@ def create_new_listing(request):
     return render(request, "auctions/create_new_listing.html", {
                   "form": NewListingForm(),
                   })
-
-
-def show_categories(request):
-    return render(request, "auctions/categories.html", {
-        "categories": AuctionCategories.objects.all()
-    })
 
 
 def show_listing(request, listing_id):
@@ -251,4 +247,19 @@ def watchlist(request):
     user_watchlist = Watchlist.objects.filter(user=request.user)
     return render(request, "auctions/watchlist.html", {
         "watchlist": user_watchlist
+    })
+
+
+def show_categories(request):
+    return render(request, "auctions/categories.html", {
+        "categories": AuctionCategories.objects.all()
+    })
+
+
+def show_category(request, category_name):
+    # Get all auctions in the watchlist of the current user
+    category_id = AuctionCategories.objects.all().get(category_name=category_name).id
+    auctions = Auction.objects.filter(categories=category_id)
+    return render(request, "auctions/category.html", {
+        "auctions": auctions
     })
