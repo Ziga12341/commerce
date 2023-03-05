@@ -11,6 +11,7 @@ class User(AbstractUser):
     pass
 
 
+# note to myself: name should not be in plural
 class AuctionCategories(models.Model):
     category_name = models.CharField(max_length=64)
 
