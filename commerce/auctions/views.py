@@ -243,3 +243,12 @@ def show_listing(request, listing_id):
         "commentForm": AddCommentForm()
 
     })
+
+
+@login_required(login_url='/login')
+def watchlist(request):
+    # Get all auctions in the watchlist of the current user
+    user_watchlist = Watchlist.objects.filter(user=request.user)
+    return render(request, "auctions/watchlist.html", {
+        "watchlist": user_watchlist
+    })
