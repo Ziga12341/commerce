@@ -8,16 +8,17 @@ from .models import User, Auction, Bid, Comment, AuctionCategories, Watchlist
 from django import forms
 from django.shortcuts import redirect
 
+
 class NewListingForm(forms.Form):
-    title = forms.CharField(label="Title")
-    description = forms.CharField(label="Description")
-    current_price = forms.DecimalField(label="Current Price")
+    title = forms.CharField(label="Title", widget=forms.TextInput(attrs={'placeholder': 'Title', 'style': 'width: 500px;', 'class': 'form-control'}))
+    description = forms.CharField(label="Description", widget=forms.TextInput(attrs={'placeholder': 'Description', 'style': 'width: 500px;', 'class': 'form-control'}))
+    current_price = forms.DecimalField(label="Price", widget=forms.TextInput(attrs={'placeholder': 'Price', 'style': 'width: 500px;', 'class': 'form-control'}))
+    image_url = forms.URLField(label="Image URL", required=False, widget=forms.TextInput(attrs={'placeholder': 'Image URL', 'style': 'width: 500px;', 'class': 'form-control'}))
     categories = forms.CharField(
         label='Choose category',
         widget=forms.Select(choices=
                             [category for category in AuctionCategories.objects.all().values_list(
-                                    'category_name', 'category_name')]))
-    image_url = forms.URLField(label="Image URL", required=False)
+                                    'category_name', 'category_name')], attrs={'class': 'form-control', 'style': 'width: 500px;'}))
 
 
 class AddListingToWatchlistForm(forms.Form):
@@ -37,7 +38,7 @@ class CloseAuctionForm(forms.Form):
 
 
 class AddCommentForm(forms.Form):
-    comment = forms.CharField(label='Comment', widget=forms.Textarea(attrs={'name':'comment', 'rows':4, 'cols':60}))
+    comment = forms.CharField(label='Comment', widget=forms.Textarea(attrs={'name':'comment', 'style': 'width: 400px;', 'class': 'form-control'}))
 
 
 def index(request):

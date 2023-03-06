@@ -1,11 +1,18 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    User <strong>{{ user.username }}</strong>
-    <form action= "{% url 'new' %}" method="post">
-        <input type="hidden" name="user" value="{{ user.id }}">
-        {% csrf_token %}
-        {{ form }}
-        <input type="submit" value="Create">
-    </form>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8">
+                <h1 class="my-4">Create a new listing</h1>
+                    <small>It's free and easy!</small>
+                <form action= "{% url 'new' %}" method="post">
+                    <input type="hidden" name="user" value="{{ user.id }}">
+                    {% csrf_token %}
+                    {{ form }}
+                    <input type="submit" value="Create">
+                </form>
+            </div>
+        </div>
+    </div>
 {% endblock %}

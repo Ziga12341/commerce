@@ -20,6 +20,9 @@
         {% endif %}
         <div class="col-6">
           <div class="p-3 border bg-light">
+            {% if in_watchlist %}
+                <span class="badge bg-primary">ITEM IN WATCHLIST</span>
+            {% endif %}
               <h2> {{ listing.title }}</h2>
               {% if not listing_closed %}
                   <p><h4>ACTIVE - you can bid on this item</h4></p>
@@ -43,8 +46,7 @@
         <div class="col-6">
           <div class="p-3 border bg-light">
             {% if currently_logged_in_user == who_created_listing and not listing_closed %}
-                <p>Logged in user created this auction. User is: {{ user.username }}</p>
-                <p>You can close this listing</p>
+                <p>You can close this listing here: </p>
                 <form style="margin-bottom: 8px" action="{% url 'listing' listing.id %}" method="POST">
                     {% csrf_token %}
                     {{ closeForm.close_auction.as_hidden }}
@@ -61,7 +63,6 @@
                         {{ removeForm.remove_from_watchlist.as_hidden }}
                         <button class="btn btn-primary" type="submit">Remove from Watchlist</button>
                     </form>
-                    <p>Item in watchlist</p>
                 {% else %}
                     <!--add to watchlist button-->
                     <form style="margin-bottom: 8px" action="{% url 'listing' listing.id %}" method="POST">
@@ -69,7 +70,6 @@
                         {{ addForm.add_to_watchlist.as_hidden }}
                         <button class="btn btn-primary" type="submit">Add to Watchlist</button>
                     </form>
-                    <p>Item not in watchlist</p>
                 {% endif %}
             {% else %}
                 <h6>Please <a href="{% url 'login' %}">log in to:</a></h6>
@@ -111,7 +111,7 @@
                 {% csrf_token %}
                 {{ commentForm.comment }}
                 <div class="form-group">
-                    <button class="btn btn-primary" type="submit">Add comment</button>
+                    <button style="margin-top: 8px" class="btn btn-primary" type="submit">Add comment</button>
                 </div>
             </form>
             {% endif %}

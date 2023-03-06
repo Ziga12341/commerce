@@ -1,14 +1,17 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
+    <div style="margin: 8px">
     <h2>Active Listings</h2>
         <ul>
         {% for listing in listings %}
             {% if not listing.closed %}
                 <div class="col-md-6 col-top">
-                    <div class="card">
+                    <div class="card" style="margin: 16px">
                       {% if listing.image_url %}
-                        <img src="{{ listing.image_url }}" class="card-img-top img-thumbnail" alt="Listing Photo">
+                        <a href="{% url 'listing' listing.id %}">
+                          <img src="{{ listing.image_url }}" class="card-img-top img-thumbnail" alt="Listing Photo">
+                        </a>
                       {% endif %}
                       <div class="card-body">
                       <h5 class="card-title">{{ listing.title }}</h5>
@@ -18,8 +21,10 @@
                       </div>
                     </div>
                 </div>
+
             {% endif %}
         {% endfor %}
         </ul>
     <a href="{% url 'new' %}">Create new listing</a>
+    </div>
 {% endblock %}
