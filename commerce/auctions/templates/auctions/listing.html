@@ -1,4 +1,6 @@
 {% extends "auctions/layout.html" %}
+{% load static %}
+
 
 {% load static %}
 {% block title %}Listing{% endblock %}
@@ -6,7 +8,7 @@
     <head>
         <title>Auctions</title>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-        <link href="{% static 'commerce\auctions\static\auctions\styles.css ' %}" rel="stylesheet">
+        <link href="{% static 'commerce\auctions\static\auctions\styles.css' %}" rel="stylesheet">
     </head>
 {% endblock %}
 
@@ -14,7 +16,7 @@
 {% block body %}
     <div class="container">
         {% if user.is_authenticated %}
-        <p>Welcome, {{ user.username }}!</p>
+        <p>Welcome, {{ user.username|title }}!</p>
         {% else %}
             <p>Please <a href="{% url 'login' %}">log in</a> to continue.</p>
         {% endif %}
@@ -23,7 +25,7 @@
             {% if in_watchlist %}
                 <span class="badge bg-primary">ITEM IN WATCHLIST</span>
             {% endif %}
-              <h2> {{ listing.title }}</h2>
+              <h2> {{ listing.title|upper }}</h2>
               {% if not listing_closed %}
                   <p><h4>ACTIVE - you can bid on this item</h4></p>
               {% else %}
@@ -35,10 +37,10 @@
                   {% endif %}
                {% endif %}
                     <ul style="list-style-type: none">
-                        <li><img alt="URL that lead to listing image" width="350" src="{{ listing.image_url }}"></li>
+                        <li><img alt="Broken URL that lead to listing image" width="350" src="{{ listing.image_url }}"></li>
                         <li>{{ listing.title }}</li>
                         <li>{{ listing.description }}</li>
-                        <li>{{ listing.current_price }}€</li>
+                        <li>{{ listing.current_price }} €</li>
                     </ul>
 
           </div>

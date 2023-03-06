@@ -1,4 +1,6 @@
 {% extends "auctions/layout.html" %}
+{% load static %}
+
 
 {% block body %}
     <div style="margin: 8px">
@@ -14,9 +16,9 @@
                         </a>
                       {% endif %}
                       <div class="card-body">
-                      <h5 class="card-title">{{ listing.title }}</h5>
+                      <h5 class="card-title">{{ listing.title|upper }}</h5>
                       <p class="card-text">{{ listing.description }}</p>
-                      <p class="card-text">Current Price: ${{ listing.current_price }}</p>
+                      <p class="card-text">Current Price: {{ listing.current_price }} €</p>
                       <a href="{% url 'listing' listing.id %}" class="btn btn-primary">View Listing</a>
                       </div>
                     </div>

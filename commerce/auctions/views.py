@@ -16,9 +16,10 @@ class NewListingForm(forms.Form):
     image_url = forms.URLField(label="Image URL", required=False, widget=forms.TextInput(attrs={'placeholder': 'Image URL', 'style': 'width: 500px;', 'class': 'form-control'}))
     categories = forms.CharField(
         label='Choose category',
+        required=False,
         widget=forms.Select(choices=
                             [category for category in AuctionCategories.objects.all().values_list(
-                                    'category_name', 'category_name')], attrs={'class': 'form-control', 'style': 'width: 500px;'}))
+                                    'category_name', 'category_name')], attrs={'class': 'form-control', 'style': 'width: 500px;', 'placeholder': 'Choose category'}))
 
 
 class AddListingToWatchlistForm(forms.Form):

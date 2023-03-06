@@ -3,8 +3,11 @@
 {% block body %}
     <h3>List of all categories</h3>
     <ul>
-        {% for category in categories  %}
-            <li><a href="{% url 'category' category_name=category.category_name %}">{{ category.category_name }}</a></li>
+        {% for category in categories %}
+            {% if category.category_name == '' %}
+            {% else %}
+                <li><a href="{% url 'category' category_name=category.category_name %}">{{ category.category_name }}</a></li>
+            {% endif %}
         {% endfor %}
     </ul>
 {% endblock %}
