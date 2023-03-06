@@ -15,3 +15,9 @@ body {
 .col-top {
     padding: 16px;
 }
+
+form {
+    padding: 10px;
+    margin-bottom: 8px;
+    font-size: 16px;
+}

@@ -1,103 +1,156 @@
 {% extends "auctions/layout.html" %}
 
+{% load static %}
+{% block title %}Listing{% endblock %}
+{% block head %}
+    <head>
+        <title>Auctions</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        <link href="{% static 'commerce\auctions\static\auctions\styles.css ' %}" rel="stylesheet">
+    </head>
+{% endblock %}
+
+
 {% block body %}
-    {% if user.is_authenticated %}
+    <div class="container">
+        {% if user.is_authenticated %}
         <p>Welcome, {{ user.username }}!</p>
-    {% else %}
-        <p>Please <a href="{% url 'login' %}">log in</a> to continue.</p>
-    {% endif %}
-    <h2>Listing {{ listing.id }}</h2>
-    {% if not listing_closed %}
-        <p>This listing is active</p>
-    {% else %}
-        <p>This listing is closed</p>
-        {% if winner == currently_logged_in_user %}
-            <h3>YOU WON THIS ITEM</h3>
         {% else %}
-            <h3>Winner of this auction is {{ winner }}</h3>
+            <p>Please <a href="{% url 'login' %}">log in</a> to continue.</p>
         {% endif %}
-    {% endif %}
-    <p>Listing created by {{ who_created_listing }}</p>
-    <p>Listing created on {{ listing.created_on }}</p>
-    <p>Listing last updated on {{ listing.last_updated }}</p>
-    <p>Listing last updated by {{ listing.last_updated_by }}</p>
-        <ul>
-            <div>
-                <div><img src="{{ listing.image_url }}"></div>
-                <div>{{ listing.title }}</div>
-                <div>{{ listing.description }}</div>
-                <div>{{ listing.current_price }}€</div>
-            </div>
-        </ul>
-    {% if user.is_authenticated %}
-        <!--if this user is logged in display Logged-in user created this auction else display this listing is from this user-->
-        {% if currently_logged_in_user == who_created_listing and not listing_closed %}
-            <p>Logged in user created this auction. User is: {{ user.username }}</p>
-            <p>You can close this listing</p>
-            <form action="{% url 'listing' listing.id %}" method="POST">
-                {% csrf_token %}
-                {{ closeForm.close_auction.as_hidden }}
-                <button type="submit">Close listing</button>
-            </form>
-        {% else %}
-            <p>This listing is from {{ who_created_listing }}</p>
-        {% endif %}
+        <div class="col-6">
+          <div class="p-3 border bg-light">
+              <h2> {{ listing.title }}</h2>
+              {% if not listing_closed %}
+                  <p><h4>ACTIVE - you can bid on this item</h4></p>
+              {% else %}
+                  <p>This listing is closed</p>
+                  {% if winner == currently_logged_in_user %}
+                        <h3>YOU WON THIS ITEM</h3>
+                  {% else %}
+                       <h3>Winner of this auction is {{ winner }}</h3>
+                  {% endif %}
+               {% endif %}
+                    <ul style="list-style-type: none">
+                        <li><img alt="URL that lead to listing image" width="350" src="{{ listing.image_url }}"></li>
+                        <li>{{ listing.title }}</li>
+                        <li>{{ listing.description }}</li>
+                        <li>{{ listing.current_price }}€</li>
+                    </ul>
 
-        <!--if this user already added item to watchlist display Item in watchlist else Item not in watchlist-->
-        {% if in_watchlist %}
-            <!--remove from watchlist button-->
-            <form action="{% url 'listing' listing.id %}" method="POST">
-                {% csrf_token %}
-                {{ removeForm.remove_from_watchlist.as_hidden }}
-                <button type="submit">Remove from Watchlist</button>
-            </form>
-            <p>Item in watchlist</p>
-        {% else %}
-            <!--add to watchlist button-->
-            <form action="{% url 'listing' listing.id %}" method="POST">
-                {% csrf_token %}
-                {{ addForm.add_to_watchlist.as_hidden }}
-                <button type="submit">Add to Watchlist</button>
-            </form>
-            <p>Item not in watchlist</p>
-        {% endif %}
-
-        <!--logged-in user can bid on item-->
-        <!--number of bids so far-->
-        {% if not listing_closed %}
-            <p>Place a bid</p>
-            <p>Current bid: {{ listing.current_price }} €</p>
-            <p>Number of bids so far {{ number_of_bids }}</p>
-            <form action="{% url 'listing' listing.id %}" method="POST">
-                {% csrf_token %}
-                {{ bidForm.bid }}
-                <button type="submit">Bid</button>
-            </form>
-        {% endif %}
-
-        <!--Add comments to page-->
-        <h2>Comments</h2>
-        <form action="{% url 'listing' listing.id %}" method="POST">
-            {% csrf_token %}
-            {{ commentForm.comment }}
-            <button type="submit">Add comment</button>
-        </form>
-        <p>Number of comments: {{ number_of_comments }}</p>
-        <p>Comments:</p>
-        <div class="comments">
-        <ul>
-            {% for comment in comments %}
-                <li>{{ comment.content }}</li>
-                <li>Commented by {{ comment.user }}</li>
-                <li>Commented on {{ comment.created_at }}</li>
-                <li>------------------------------------------</li>
-            {% endfor %}
-        </ul>
+          </div>
         </div>
-    <div>Additional info</div>
-        <div>Category: {{ category_name }}</div>
-    {% else %}
-        <p>Please <a href="{% url 'login' %}">log in</a> to continue.</p>
-    {% endif %}
+        <div class="col-6">
+          <div class="p-3 border bg-light">
+            {% if currently_logged_in_user == who_created_listing and not listing_closed %}
+                <p>Logged in user created this auction. User is: {{ user.username }}</p>
+                <p>You can close this listing</p>
+                <form style="margin-bottom: 8px" action="{% url 'listing' listing.id %}" method="POST">
+                    {% csrf_token %}
+                    {{ closeForm.close_auction.as_hidden }}
+                    <button class="btn btn-primary" type="submit">Close listing</button>
+                </form>
+            {% endif %}
+
+            <!--if this user already added item to watchlist display Item in watchlist else Item not in watchlist-->
+            {% if user.is_authenticated %}
+                {% if in_watchlist %}
+                    <!--remove from watchlist button-->
+                    <form style="margin-bottom: 8px" action="{% url 'listing' listing.id %}" method="POST">
+                        {% csrf_token %}
+                        {{ removeForm.remove_from_watchlist.as_hidden }}
+                        <button class="btn btn-primary" type="submit">Remove from Watchlist</button>
+                    </form>
+                    <p>Item in watchlist</p>
+                {% else %}
+                    <!--add to watchlist button-->
+                    <form style="margin-bottom: 8px" action="{% url 'listing' listing.id %}" method="POST">
+                        {% csrf_token %}
+                        {{ addForm.add_to_watchlist.as_hidden }}
+                        <button class="btn btn-primary" type="submit">Add to Watchlist</button>
+                    </form>
+                    <p>Item not in watchlist</p>
+                {% endif %}
+            {% else %}
+                <h6>Please <a href="{% url 'login' %}">log in to:</a></h6>
+                <ul>
+                    <li></a> to add item to <a href="{% url 'watchlist' %}">Watchlist</a></li>
+                    <li></a> to bid on item</li>
+                    <li></a> to add comments to item</li>
+                </ul>
+            {% endif %}
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="p-3 border bg-light">
+          <!--logged-in user can bid on item-->
+          <!--number of bids so far-->
+            {% if user.is_authenticated %}
+                {% if not listing_closed %}
+                    <p>Place a bid</p>
+                    <p>Current bid: {{ listing.current_price }} €</p>
+                    <p>Number of bids so far {{ number_of_bids }}</p>
+                    <form style="margin-bottom: 8px" action="{% url 'listing' listing.id %}" method="POST">
+                        {% csrf_token %}
+                        {{ bidForm.bid }}
+                        <div style="margin-top: 8px">
+                            <button class="btn btn-primary" type="submit">Bid</button>
+                        </div>
+                    </form>
+                {% endif %}
+            {% endif %}
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="p-3 border bg-light">
+          <!--Add comments to page-->
+            {% if user.is_authenticated %}
+
+            <h2>Comments</h2>
+            <form style="margin-bottom: 8px" action="{% url 'listing' listing.id %}" method="POST">
+                {% csrf_token %}
+                {{ commentForm.comment }}
+                <div class="form-group">
+                    <button class="btn btn-primary" type="submit">Add comment</button>
+                </div>
+            </form>
+            {% endif %}
+            {% if number_of_comments == 0 %}
+                <p>There are no comments for this item yet</p>
+            {% else %}
+                <p><b>Comments:</b></p>
+                <p>Number of comments: {{ number_of_comments }}</p>
+            <div class="comments">
+                <ul style=" list-style-type: none">
+                        {% for comment in comments %}
+                            <div style="margin-top: 16px">
+                                <li><b>{{ comment.content }}</b></li>
+                                <li>Commented by {{ comment.user }}</li>
+                                <li>Commented on {{ comment.created_at }}</li>
+                            </div>
+                        {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            <div>
+                <h5>Additional info:</h5>
+                <div STYLE="padding: 8px">
+
+                    {% if category_name == None %}
+                        <div>Category: not set for this item</div>
+                    {% else %}
+                        <div>Category: {{ category_name }}</div>
+                    {% endif %}
+                    <p>Listing id: {{ listing.id }}</p>
+                    <p>This listing published by user: {{ who_created_listing }}</p>
+                    <p>Listing created at: {{ listing.created_at }}</p>
+                </div>
+            </div>
+
+
+
+          </div>
+        </div>
+      </div>
     <a href="{% url 'new' %}">Create new listing</a>
 {% endblock %}

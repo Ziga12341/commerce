@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from .models import User, Auction, Bid, Comment, AuctionCategories, Watchlist
 from django import forms
-
+from django.shortcuts import redirect
 
 class NewListingForm(forms.Form):
     title = forms.CharField(label="Title")
@@ -29,7 +29,7 @@ class RemoveListingFromWatchlistForm(forms.Form):
 
 
 class AddBidForm(forms.Form):
-    bid = forms.DecimalField(label="Bid")
+    bid = forms.DecimalField(label="Bid", required=True)
 
 
 class CloseAuctionForm(forms.Form):
@@ -37,7 +37,7 @@ class CloseAuctionForm(forms.Form):
 
 
 class AddCommentForm(forms.Form):
-    comment = forms.CharField(label='Comment', widget=forms.Textarea(attrs={'name':'comment', 'rows':10, 'cols':40}))
+    comment = forms.CharField(label='Comment', widget=forms.Textarea(attrs={'name':'comment', 'rows':4, 'cols':60}))
 
 
 def index(request):
@@ -52,18 +52,22 @@ def login_view(request):
         # Attempt to sign user in
         username = request.POST["username"]
         password = request.POST["password"]
+        url = request.POST.get('next', '/')
         user = authenticate(request, username=username, password=password)
 
         # Check if authentication successful
         if user is not None:
             login(request, user)
-            return HttpResponseRedirect(reverse("index"))
+            return redirect(url)
         else:
             return render(request, "auctions/login.html", {
                 "message": "Invalid username and/or password."
             })
     else:
-        return render(request, "auctions/login.html")
+        return render(request, "auctions/login.html", {
+            "url": request.GET.get('next', '/')
+        }
+                      )
 
 
 def logout_view(request):
